@@ -60,7 +60,7 @@ body {
 }
 
 .logo-studio {
-    height: 40px;
+    height: 60px;
     width: auto;
 }
 
@@ -108,7 +108,7 @@ body {
 }
 
 .hero-logo {
-    height: 120px;
+    height: 200px;
     width: auto;
     margin-bottom: 30px;
     filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
