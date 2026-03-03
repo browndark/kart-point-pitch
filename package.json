@@ -19,5 +19,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/seu-usuario/kart-point-pitch.git"
+  },
+  "dependencies": {
+    "puppeteer": "^24.37.5"
   }
 }
