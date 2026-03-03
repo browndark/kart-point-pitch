@@ -26,6 +26,8 @@ let record = localStorage.getItem('kartPointRecord') || 0;
 let roadOffset = 0;
 let timeRemaining = 180; // 3 minutos
 let gameTimer = null;
+let spawnCounter = { enemy: 0, obstacle: 0, coin: 0 };
+let difficulty = 1; // Progressão de dificuldade
 
 // Player Kart
 const player = {
@@ -139,10 +141,10 @@ const EnemyKart = class {
     constructor() {
         this.x = (Math.random() - 0.5) * 150;
         this.y = 10;
-        this.z = player.z - 500 - Math.random() * 300;
+        this.z = player.z - 600 - Math.random() * 400;
         this.width = 30;
         this.height = 30;
-        this.speed = Math.random() * 2 + 3;
+        this.speed = Math.random() * 2 + 2.5;
         this.direction = Math.random() > 0.5 ? 1 : -1;
         this.mesh = createKartMesh(0x00ff00);
         this.mesh.position.set(this.x, this.y, this.z);
@@ -175,10 +177,10 @@ const Obstacle = class {
     constructor() {
         this.x = (Math.random() - 0.5) * 150;
         this.y = 15;
-        this.z = player.z - 500 - Math.random() * 300;
+        this.z = player.z - 600 - Math.random() * 400;
         this.width = 30;
         this.height = 30;
-        this.speed = Math.random() * 2 + 1;
+        this.speed = Math.random() * 1.5 + 1.5;
         this.rotation = 0;
         
         const obstacleGeometry = new THREE.BoxGeometry(30, 30, 30);
@@ -211,7 +213,7 @@ const Coin = class {
     constructor() {
         this.x = (Math.random() - 0.5) * 150;
         this.y = 30;
-        this.z = player.z - 500 - Math.random() * 300;
+        this.z = player.z - 600 - Math.random() * 400;
         this.width = 20;
         this.height = 20;
         this.speed = Math.random() * 1.5 + 1;
@@ -344,19 +346,34 @@ function updateGame() {
         }
     });
 
-    // Spawn new enemies
-    if (Math.random() < 0.015) {
-        enemies.push(new EnemyKart());
+    // Spawn new enemies - com espaçamento melhor
+    spawnCounter.enemy++;
+    const enemySpawnRate = Math.max(80, 100 - (180 - timeRemaining) * 0.2); // Aumenta dificuldade
+    if (spawnCounter.enemy >= enemySpawnRate) {
+        if (enemies.length < 3) { // Máximo de 3 inimigos simultaneamente
+            enemies.push(new EnemyKart());
+            spawnCounter.enemy = 0;
+        }
     }
 
-    // Spawn new obstacles
-    if (Math.random() < 0.012) {
-        obstacles.push(new Obstacle());
+    // Spawn new obstacles - com espaçamento melhor
+    spawnCounter.obstacle++;
+    const obstacleSpawnRate = Math.max(100, 120 - (180 - timeRemaining) * 0.25); // Aumenta dificuldade
+    if (spawnCounter.obstacle >= obstacleSpawnRate) {
+        if (obstacles.length < 2) { // Máximo de 2 obstáculos simultaneamente
+            obstacles.push(new Obstacle());
+            spawnCounter.obstacle = 0;
+        }
     }
 
-    // Spawn new coins
-    if (Math.random() < 0.025) {
-        coins_list.push(new Coin());
+    // Spawn new coins - mais frequentes
+    spawnCounter.coin++;
+    const coinSpawnRate = Math.max(60, 80 - (180 - timeRemaining) * 0.15); // Aumenta dificuldade
+    if (spawnCounter.coin >= coinSpawnRate) {
+        if (coins_list.length < 4) { // Máximo de 4 moedas simultaneamente
+            coins_list.push(new Coin());
+            spawnCounter.coin = 0;
+        }
     }
 }
 
@@ -431,6 +448,7 @@ function startGame() {
     coins = 0;
     timeRemaining = 180; // Reset para 3 minutos
     window.frameCounter = 0;
+    spawnCounter = { enemy: 0, obstacle: 0, coin: 0 };
     cleanupGame();
     
     player.x = 0;
@@ -464,6 +482,7 @@ function resetGame() {
     coins = 0;
     timeRemaining = 180; // Reset para 3 minutos
     window.frameCounter = 0;
+    spawnCounter = { enemy: 0, obstacle: 0, coin: 0 };
     cleanupGame();
     
     player.x = 0;
