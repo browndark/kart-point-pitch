@@ -96,7 +96,7 @@ const EnemyKart = class {
     constructor() {
         this.x = (Math.random() - 0.5) * 200;
         this.y = 0;
-        this.z = -400;
+        this.z = player.z - 400;
         this.width = 30;
         this.height = 30;
         this.speed = Math.random() * 3 + 2;
@@ -118,7 +118,7 @@ const EnemyKart = class {
     }
 
     isOffScreen() {
-        return this.z > 150;
+        return this.z > player.z + 150;
     }
 
     dispose() {
@@ -132,7 +132,7 @@ const Obstacle = class {
     constructor() {
         this.x = (Math.random() - 0.5) * 200;
         this.y = 0;
-        this.z = -400;
+        this.z = player.z - 400;
         this.width = 30;
         this.height = 30;
         this.speed = Math.random() * 2 + 1;
@@ -154,7 +154,7 @@ const Obstacle = class {
     }
 
     isOffScreen() {
-        return this.z > 150;
+        return this.z > player.z + 150;
     }
 
     dispose() {
@@ -168,7 +168,7 @@ const Coin = class {
     constructor() {
         this.x = (Math.random() - 0.5) * 200;
         this.y = 0;
-        this.z = -400;
+        this.z = player.z - 400;
         this.width = 20;
         this.height = 20;
         this.speed = Math.random() * 1.5 + 0.5;
@@ -189,7 +189,7 @@ const Coin = class {
     }
 
     isOffScreen() {
-        return this.z > 150;
+        return this.z > player.z + 150;
     }
 
     dispose() {
@@ -237,7 +237,6 @@ function updateGame() {
         if (checkCollision(player, enemy)) {
             score = Math.max(0, score - 20);
             updateScore();
-            player.z -= 30;
         }
     });
 
@@ -253,7 +252,6 @@ function updateGame() {
         if (checkCollision(player, obstacle)) {
             score = Math.max(0, score - 20);
             updateScore();
-            player.z -= 30;
         }
     });
 
@@ -293,6 +291,12 @@ function updateGame() {
 
 // Render game
 function renderGame() {
+    // Câmera segue o jogador
+    camera.position.x = player.x * 0.3;
+    camera.position.y = 50;
+    camera.position.z = player.z + 150;
+    camera.lookAt(player.x, 0, player.z);
+    
     renderer.render(scene, camera);
 }
 
