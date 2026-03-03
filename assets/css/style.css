@@ -542,6 +542,86 @@ body {
     font-size: 0.9rem;
 }
 
+/* Team Section */
+.team {
+    padding: 60px 0;
+    background: var(--dark-bg);
+}
+
+.team h2 {
+    font-size: 2.5rem;
+    margin-bottom: 50px;
+    text-align: center;
+    color: var(--accent-color);
+    position: relative;
+}
+
+.team h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    margin: 20px auto 0;
+    border-radius: 2px;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.team-member {
+    text-align: center;
+    background: var(--card-bg);
+    padding: 30px 20px;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.team-member:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary-color);
+    box-shadow: 0 20px 40px rgba(255, 107, 53, 0.2);
+}
+
+.team-image {
+    margin-bottom: 20px;
+    overflow: hidden;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 3px solid var(--primary-color);
+}
+
+.team-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.team-member:hover .team-image img {
+    transform: scale(1.1);
+}
+
+.team-member h3 {
+    color: var(--accent-color);
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.team-role {
+    color: #b0b0b0;
+    font-size: 0.95rem;
+    font-style: italic;
+}
+
 /* Animations */
 @keyframes fadeInDown {
     from {
@@ -581,13 +661,14 @@ body {
     .about h2,
     .gameplay h2,
     .mechanics h2,
-    .gallery h2,
-    .reference h2 {
+    .reference h2,
+    .team h2 {
         font-size: 2rem;
     }
 
     .gameplay-grid,
-    .mechanics-grid {
+    .mechanics-grid,
+    .team-grid {
         grid-template-columns: 1fr;
     }
 
