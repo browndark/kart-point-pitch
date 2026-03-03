@@ -588,7 +588,7 @@ body {
 
 .mosaic-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 15px;
 }
 
@@ -601,10 +601,11 @@ body {
     cursor: pointer;
 }
 
-.mosaic-item:nth-child(5) {
-    grid-column: 1 / -1;
-    max-width: 50%;
-    margin: 0 auto;
+.mosaic-item:nth-child(5),
+.mosaic-item:nth-child(6) {
+    grid-column: auto;
+    max-width: 100%;
+    margin: auto;
 }
 
 .mosaic-item:hover {
