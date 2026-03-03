@@ -80,14 +80,6 @@ function createKartMesh(color) {
 player.mesh = createKartMesh(0xff6b35);
 scene.add(player.mesh);
 
-// Create road/track
-const roadGeometry = new THREE.PlaneGeometry(200, 2000);
-const roadMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
-const road = new THREE.Mesh(roadGeometry, roadMaterial);
-road.rotation.x = -Math.PI / 2;
-road.position.y = -15;
-scene.add(road);
-
 // Road stripes for visual effect
 const roadStripes = [];
 function createRoadStripes() {
@@ -103,6 +95,19 @@ function createRoadStripes() {
     }
 }
 createRoadStripes();
+
+// Road mesh
+let roadMesh;
+const startRoad = () => {
+    if (roadMesh) scene.remove(roadMesh);
+    const roadGeometry = new THREE.PlaneGeometry(200, 3000);
+    const roadMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+    roadMesh = new THREE.Mesh(roadGeometry, roadMaterial);
+    roadMesh.rotation.x = -Math.PI / 2;
+    roadMesh.position.y = -15;
+    scene.add(roadMesh);
+};
+startRoad();
 
 // Road walls
 const wallGeometry = new THREE.BoxGeometry(20, 50, 2000);
@@ -134,7 +139,7 @@ const EnemyKart = class {
     constructor() {
         this.x = (Math.random() - 0.5) * 150;
         this.y = 10;
-        this.z = player.z - 300 - Math.random() * 300;
+        this.z = player.z - 500 - Math.random() * 300;
         this.width = 30;
         this.height = 30;
         this.speed = Math.random() * 2 + 3;
@@ -156,7 +161,7 @@ const EnemyKart = class {
     }
 
     isOffScreen() {
-        return this.z > player.z + 100;
+        return this.z > player.z + 50;
     }
 
     dispose() {
@@ -170,7 +175,7 @@ const Obstacle = class {
     constructor() {
         this.x = (Math.random() - 0.5) * 150;
         this.y = 15;
-        this.z = player.z - 300 - Math.random() * 300;
+        this.z = player.z - 500 - Math.random() * 300;
         this.width = 30;
         this.height = 30;
         this.speed = Math.random() * 2 + 1;
@@ -192,7 +197,7 @@ const Obstacle = class {
     }
 
     isOffScreen() {
-        return this.z > player.z + 100;
+        return this.z > player.z + 50;
     }
 
     dispose() {
@@ -206,7 +211,7 @@ const Coin = class {
     constructor() {
         this.x = (Math.random() - 0.5) * 150;
         this.y = 30;
-        this.z = player.z - 300 - Math.random() * 300;
+        this.z = player.z - 500 - Math.random() * 300;
         this.width = 20;
         this.height = 20;
         this.speed = Math.random() * 1.5 + 1;
@@ -227,7 +232,7 @@ const Coin = class {
     }
 
     isOffScreen() {
-        return this.z > player.z + 100;
+        return this.z > player.z + 50;
     }
 
     dispose() {
@@ -283,6 +288,9 @@ function updateGame() {
     roadOffset += 3;
     roadStripes.forEach((stripe, index) => {
         stripe.position.z = player.z - 1000 + (index * 50) + (roadOffset % 50);
+        if (stripe.position.z > player.z + 200) {
+            stripe.position.z -= 2000;
+        }
     });
 
     // Update enemies
@@ -351,11 +359,24 @@ function updateGame() {
 
 // Render game
 function renderGame() {
-    // Câmera em terceira pessoa atrás do kart
-    camera.position.x = player.x * 0.8;
-    camera.position.y = 60;
-    camera.position.z = player.z - 100;
-    camera.lookAt(player.x, 10, player.z + 50);
+    // Câmera em terceira pessoa - fixa atrás do kart, mostrando a pista à frente
+    const cameraDistance = 80;
+    const cameraHeight = 50;
+    
+    camera.position.x = player.x;
+    camera.position.y = cameraHeight;
+    camera.position.z = player.z + cameraDistance;
+    
+    camera.lookAt(player.x, 20, player.z - 100);
+    
+    // Atualiza posição da pista
+    if (roadMesh) {
+        roadMesh.position.z = player.z;
+    }
+    
+    // Atualiza posição das paredes
+    wallLeft.position.z = player.z;
+    wallRight.position.z = player.z;
     
     renderer.render(scene, camera);
 }
