@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kart Point - Pitch</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <img src="assets/images/logo-studio.png" alt="Studio Logo" class="logo-studio">
+                <h1>Kart Point</h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#sobre">Sobre</a></li>
+                <li><a href="#jogabilidade">Jogabilidade</a></li>
+                <li><a href="#mecanicas">Mecânicas</a></li>
+                <li><a href="#galeria">Galeria</a></li>
+                <li><a href="#referencia">Referência</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <img src="assets/images/kart-point-logo.png" alt="Kart Point" class="hero-logo">
+                <h1 class="hero-title">Kart Point</h1>
+                <p class="hero-subtitle">Um jogo de corrida emocionante com mecânicas inovadoras de coleta de moedas e desvio de obstáculos</p>
+                <div class="hero-cta">
+                    <button class="btn btn-primary" onclick="document.getElementById('sobre').scrollIntoView({behavior: 'smooth'})">
+                        Conheça o Jogo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre o Jogo -->
+    <section id="sobre" class="about">
+        <div class="container">
+            <h2>Sobre Kart Point</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <div class="about-icon">🎮</div>
+                    <h3>Gênero</h3>
+                    <p>Jogo de Corrida com elementos de ação e coleta</p>
+                </div>
+                <div class="about-card">
+                    <div class="about-icon">🎨</div>
+                    <h3>Estilo Visual</h3>
+                    <p>2D e 3D híbridos para uma experiência visual única</p>
+                </div>
+                <div class="about-card">
+                    <div class="about-icon">⚡</div>
+                    <h3>Ação Rápida</h3>
+                    <p>Velocidade e reflexo constantes durante a corrida</p>
+                </div>
+                <div class="about-card">
+                    <div class="about-icon">🏆</div>
+                    <h3>Competição</h3>
+                    <p>Sistema de recordes e ranking global</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Jogabilidade -->
+    <section id="jogabilidade" class="gameplay">
+        <div class="container">
+            <h2>Como Funciona</h2>
+            <div class="gameplay-grid">
+                <div class="gameplay-item">
+                    <div class="gameplay-number">1</div>
+                    <h3>Desvie de Obstáculos</h3>
+                    <p>Navegue pelo kart desviando de outros pilotos e obstáculos na pista com precisão e reflexo rápido.</p>
+                </div>
+                <div class="gameplay-item">
+                    <div class="gameplay-number">2</div>
+                    <h3>Colete Moedas</h3>
+                    <p>Acumule moedas durante a corrida para aumentar sua pontuação e batê-lo record.</p>
+                </div>
+                <div class="gameplay-item">
+                    <div class="gameplay-number">3</div>
+                    <h3>Evite Colisões</h3>
+                    <p>Cada colisão com obstáculos ou outros karts resulta em perda de pontos potenciais.</p>
+                </div>
+                <div class="gameplay-item">
+                    <div class="gameplay-number">4</div>
+                    <h3>Bata Recordes</h3>
+                    <p>Quanto mais moedas você coleta, melhor sua pontuação. Compita para ficar no topo do ranking!</p>
+                </div>
+            </div>
+
+            <!-- Imagens de Jogabilidade -->
+            <div class="gameplay-images">
+                <img src="assets/images/gameplay-1.jpeg" alt="Jogabilidade 1" class="gameplay-img">
+                <img src="assets/images/gameplay-2.jpeg" alt="Jogabilidade 2" class="gameplay-img">
+            </div>
+        </div>
+    </section>
+
+    <!-- Mecânicas do Jogo -->
+    <section id="mecanicas" class="mechanics">
+        <div class="container">
+            <h2>Sistema de Pontuação</h2>
+            <div class="mechanics-grid">
+                <div class="mechanic-box gain">
+                    <h3><i class="fas fa-coins"></i> Ganha Points</h3>
+                    <ul class="mechanic-list">
+                        <li><span class="points">+10</span> Por moeda coletada</li>
+                        <li><span class="points">+50</span> Por desvio perfeito</li>
+                        <li><span class="points">+100</span> Combo 5x moedas</li>
+                        <li><span class="points">+25</span> Por volta completada</li>
+                    </ul>
+                </div>
+
+                <div class="mechanic-box loss">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Perde Points</h3>
+                    <ul class="mechanic-list">
+                        <li><span class="points">-20</span> Colisão com obstáculo</li>
+                        <li><span class="points">-15</span> Colisão com outro kart</li>
+                        <li><span class="points">-10</span> Sair da pista</li>
+                        <li><span class="points">-50</span> Capotagem</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="records-info">
+                <h3>Sistema de Recordes</h3>
+                <p>Cada sessão de jogo registra sua pontuação máxima. Derrote seus próprios recordes e compare com jogadores ao redor do mundo!</p>
+                <div class="record-badge">
+                    <i class="fas fa-crown"></i>
+                    <span>Quanto mais moedas = Mais pontos = Melhor Record</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Galeria -->
+    <section id="galeria" class="gallery">
+        <div class="container">
+            <h2>Galeria</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="assets/images/gameplay-1.jpeg" alt="Gameplay Screenshot 1">
+                    <div class="gallery-overlay">
+                        <span>Jogabilidade em Ação</span>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="assets/images/gameplay-2.jpeg" alt="Gameplay Screenshot 2">
+                    <div class="gallery-overlay">
+                        <span>Momento de Coleta</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Referência / Inspiração -->
+    <section id="referencia" class="reference">
+        <div class="container">
+            <h2>Nossa Inspiração</h2>
+            <p class="reference-subtitle">Confira o vídeo de referência que inspirou a criação de Kart Point</p>
+            
+            <div class="video-container">
+                <video width="100%" height="auto" controls style="border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <source src="assets/videos/referencia.mp4" type="video/mp4">
+                    Seu navegador não suporta o elemento de vídeo.
+                </video>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Kart Point</h4>
+                    <p>Um jogo de corrida inovador com mecânicas únicas de pontuação</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links Rápidos</h4>
+                    <ul>
+                        <li><a href="#sobre">Sobre</a></li>
+                        <li><a href="#jogabilidade">Jogabilidade</a></li>
+                        <li><a href="#mecanicas">Mecânicas</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contato</h4>
+                    <p>Entre em contato conosco para saber mais!</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Kart Point. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
