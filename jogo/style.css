@@ -41,6 +41,7 @@ body {
 
 .score-display,
 .coins-display,
+.time-display,
 .record-display {
     display: flex;
     flex-direction: column;

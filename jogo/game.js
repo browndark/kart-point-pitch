@@ -24,6 +24,8 @@ let score = 0;
 let coins = 0;
 let record = localStorage.getItem('kartPointRecord') || 0;
 let roadOffset = 0;
+let timeRemaining = 180; // 3 minutos
+let gameTimer = null;
 
 // Player Kart
 const player = {
@@ -228,6 +230,22 @@ function checkCollision(pos1, pos2, radius = 30) {
 function updateGame() {
     if (!gameRunning || gamePaused) return;
 
+    // Decrement time
+    if (!window.frameCounter) window.frameCounter = 0;
+    window.frameCounter++;
+    if (window.frameCounter >= 60) {
+        timeRemaining--;
+        updateTimeDisplay();
+        window.frameCounter = 0;
+        
+        if (timeRemaining <= 0) {
+            timeRemaining = 0;
+            updateTimeDisplay();
+            endGame();
+            return;
+        }
+    }
+
     // Player movement
     if (keys['arrowleft'] || keys['a']) {
         player.x = Math.max(player.x - player.maxSpeed, -100);
@@ -336,6 +354,13 @@ function updateScore() {
     document.getElementById('coins').textContent = coins;
 }
 
+// Update time display
+function updateTimeDisplay() {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    document.getElementById('time').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
 // Update record
 function updateRecord() {
     if (score > record) {
@@ -361,6 +386,8 @@ function startGame() {
     gamePaused = false;
     score = 0;
     coins = 0;
+    timeRemaining = 180; // Reset para 3 minutos
+    window.frameCounter = 0;
     cleanupGame();
     
     player.x = 0;
@@ -369,6 +396,7 @@ function startGame() {
     player.mesh.position.set(player.x, player.y, player.z);
     
     updateScore();
+    updateTimeDisplay();
     toggleMenu();
     document.getElementById('resumeBtn').style.display = 'inline-block';
 }
@@ -391,6 +419,8 @@ function resetGame() {
     gamePaused = false;
     score = 0;
     coins = 0;
+    timeRemaining = 180; // Reset para 3 minutos
+    window.frameCounter = 0;
     cleanupGame();
     
     player.x = 0;
@@ -399,6 +429,7 @@ function resetGame() {
     player.mesh.position.set(player.x, player.y, player.z);
     
     updateScore();
+    updateTimeDisplay();
     toggleMenu();
 }
 
@@ -412,6 +443,10 @@ function toggleMenu() {
 function endGame() {
     gameRunning = false;
     updateRecord();
+    
+    // Mensagem especial quando tempo acaba
+    const title = timeRemaining <= 0 ? "🏁 CHEGOU NA LARGADA!" : "JOGO ENCERRADO!";
+    document.getElementById('gameOverTitle').textContent = title;
     
     document.getElementById('finalScore').textContent = score;
     document.getElementById('finalCoins').textContent = coins;
@@ -436,16 +471,10 @@ window.addEventListener('resize', () => {
 
 // Initialize record display
 updateRecord();
+updateTimeDisplay();
 
 // Show menu initially
 toggleMenu();
 
 // Start game loop
 gameLoop();
-
-// End game after 2 minutes
-setTimeout(() => {
-    if (gameRunning && !gamePaused) {
-        endGame();
-    }
-}, 120000);
