@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kart Point - Jogo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <div class="game-info">
+                <div class="score-display">
+                    <span class="label">PONTOS:</span>
+                    <span class="value" id="score">0</span>
+                </div>
+                <div class="coins-display">
+                    <span class="label">MOEDAS:</span>
+                    <span class="value" id="coins">0</span>
+                </div>
+                <div class="record-display">
+                    <span class="label">RECORDE:</span>
+                    <span class="value" id="record">0</span>
+                </div>
+            </div>
+            <button class="menu-btn" onclick="toggleMenu()">☰ MENU</button>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <div class="game-controls">
+            <p>⬅️/➡️ ou A/D - Mover | ESPAÇO - Aceitar | P - Pausa</p>
+        </div>
+
+        <div class="menu-modal" id="menuModal">
+            <div class="menu-content">
+                <h2>Kart Point</h2>
+                <p>Desvie dos obstáculos e colete moedas!</p>
+                
+                <div class="menu-buttons">
+                    <button onclick="startGame()" class="menu-btn-primary">Começar Jogo</button>
+                    <button onclick="resumeGame()" class="menu-btn-secondary" id="resumeBtn" style="display:none;">Continuar</button>
+                    <button onclick="resetGame()" class="menu-btn-secondary">Novo Jogo</button>
+                    <button onclick="toggleMenu()" class="menu-btn-secondary">Fechar</button>
+                </div>
+
+                <div class="menu-instructions">
+                    <h3>Como Jogar:</h3>
+                    <ul>
+                        <li>🎮 Use setas ⬅️/➡️ ou A/D para mover</li>
+                        <li>💰 Colete MOEDAS para ganhar +10 pontos</li>
+                        <li>🏎️ Desvie dos KARTS adversários</li>
+                        <li>🚧 Desvie dos OBSTÁCULOS</li>
+                        <li>❌ Colidir = -20 pontos</li>
+                        <li>🏆 Quanto mais pontos, melhor seu recorde!</li>
+                    </ul>
+                </div>
+
+                <div class="menu-credits">
+                    <p>Desenvolvido para Kart Point © 2026</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-over-modal" id="gameOverModal">
+            <div class="game-over-content">
+                <h2>JOGO ENCERRADO!</h2>
+                <div class="final-stats">
+                    <div class="stat">
+                        <span class="label">Pontuação Final:</span>
+                        <span class="value" id="finalScore">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Moedas Coletadas:</span>
+                        <span class="value" id="finalCoins">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Seu Recorde:</span>
+                        <span class="value" id="finalRecord">0</span>
+                    </div>
+                </div>
+                <div class="game-over-buttons">
+                    <button onclick="startGame()" class="btn-play">Jogar Novamente</button>
+                    <button onclick="goToPitch()" class="btn-back">Voltar ao Pitch</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

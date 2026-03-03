@@ -1,0 +1,338 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #004e89 0%, #0a0e27 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1000px;
+    height: 100vh;
+    background: #0a0e27;
+    box-shadow: 0 0 50px rgba(255, 107, 53, 0.3);
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(90deg, #004e89, #005f99);
+    border-bottom: 3px solid #ff6b35;
+}
+
+.game-info {
+    display: flex;
+    gap: 30px;
+    flex: 1;
+}
+
+.score-display,
+.coins-display,
+.record-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.label {
+    font-size: 12px;
+    color: #ffd60a;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #ff6b35;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.menu-btn {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ff6b35, #ff8c42);
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.menu-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+}
+
+#gameCanvas {
+    flex: 1;
+    background: linear-gradient(180deg, #1a3a52 0%, #0f2438 100%);
+    display: block;
+    border: 2px solid #ff6b35;
+}
+
+.game-controls {
+    text-align: center;
+    padding: 15px;
+    background: #1a1f3a;
+    border-top: 2px solid #ff6b35;
+    color: #b0b0b0;
+    font-size: 14px;
+}
+
+/* Modal Menu */
+.menu-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.menu-modal.active {
+    display: flex;
+}
+
+.menu-content {
+    background: linear-gradient(135deg, #1a1f3a, #242d47);
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 500px;
+    border: 2px solid #ff6b35;
+    box-shadow: 0 0 40px rgba(255, 107, 53, 0.4);
+}
+
+.menu-content h2 {
+    color: #ffd60a;
+    font-size: 48px;
+    margin-bottom: 10px;
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+
+.menu-content p {
+    color: #b0b0b0;
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.menu-btn-primary {
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #ff6b35, #ff8c42);
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.menu-btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(255, 107, 53, 0.5);
+}
+
+.menu-btn-secondary {
+    padding: 12px 25px;
+    background: transparent;
+    border: 2px solid #ff6b35;
+    color: #ff6b35;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.menu-btn-secondary:hover {
+    background: #ff6b35;
+    color: white;
+}
+
+.menu-instructions {
+    text-align: left;
+    margin: 30px 0;
+    padding: 20px;
+    background: rgba(255, 107, 53, 0.1);
+    border-left: 3px solid #ff6b35;
+    border-radius: 5px;
+}
+
+.menu-instructions h3 {
+    color: #ffd60a;
+    margin-bottom: 15px;
+}
+
+.menu-instructions ul {
+    list-style: none;
+    color: #b0b0b0;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.menu-instructions li {
+    margin-bottom: 8px;
+}
+
+.menu-credits {
+    color: #888;
+    font-size: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 107, 53, 0.2);
+}
+
+/* Game Over Modal */
+.game-over-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.game-over-modal.active {
+    display: flex;
+}
+
+.game-over-content {
+    background: linear-gradient(135deg, #1a1f3a, #242d47);
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 400px;
+    border: 2px solid #ff6b35;
+    box-shadow: 0 0 40px rgba(255, 107, 53, 0.4);
+}
+
+.game-over-content h2 {
+    color: #ff6b35;
+    font-size: 36px;
+    margin-bottom: 30px;
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+
+.final-stats {
+    margin-bottom: 30px;
+}
+
+.stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: rgba(255, 107, 53, 0.1);
+    border-radius: 8px;
+    align-items: center;
+}
+
+.stat .label {
+    color: #b0b0b0;
+    font-size: 14px;
+}
+
+.stat .value {
+    color: #ffd60a;
+    font-size: 24px;
+}
+
+.game-over-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-play {
+    flex: 1;
+    padding: 15px;
+    background: linear-gradient(135deg, #ff6b35, #ff8c42);
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.btn-play:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 20px rgba(255, 107, 53, 0.5);
+}
+
+.btn-back {
+    flex: 1;
+    padding: 15px;
+    background: transparent;
+    border: 2px solid #ff6b35;
+    color: #ff6b35;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: #ff6b35;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .game-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .game-info {
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .menu-content,
+    .game-over-content {
+        max-width: 90%;
+        padding: 20px;
+    }
+
+    .value {
+        font-size: 20px;
+    }
+
+    .menu-content h2 {
+        font-size: 32px;
+    }
+}
