@@ -1,10 +1,23 @@
-// Game Variables
+// Three.js Setup
 const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 
-canvas.width = canvas.offsetWidth;
-canvas.height = canvas.offsetHeight;
+renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
+renderer.setClearColor(0x1a3a52, 1);
+camera.position.set(0, 30, 150);
+camera.lookAt(0, 0, 0);
 
+// Lighting
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLight.position.set(100, 100, 50);
+scene.add(directionalLight);
+
+// Game Variables
 let gameRunning = false;
 let gamePaused = false;
 let score = 0;
@@ -13,16 +26,56 @@ let record = localStorage.getItem('kartPointRecord') || 0;
 
 // Player Kart
 const player = {
-    x: canvas.width / 2,
-    y: canvas.height - 100,
-    width: 40,
-    height: 50,
-    speed: 0,
+    x: 0,
+    y: 0,
+    z: -150,
+    width: 30,
+    height: 30,
     maxSpeed: 7,
-    acceleration: 0.3,
-    friction: 0.9,
-    color: '#ff6b35'
+    mesh: null
 };
+
+// Create kart mesh
+function createKartMesh(color) {
+    const group = new THREE.Group();
+    
+    // Body
+    const bodyGeometry = new THREE.BoxGeometry(30, 15, 50);
+    const bodyMaterial = new THREE.MeshLambertMaterial({ color });
+    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    body.position.y = 5;
+    group.add(body);
+    
+    // Window
+    const windowGeometry = new THREE.BoxGeometry(20, 10, 10);
+    const windowMaterial = new THREE.MeshLambertMaterial({ color: 0x87ceeb });
+    const window = new THREE.Mesh(windowGeometry, windowMaterial);
+    window.position.set(0, 12, -5);
+    group.add(window);
+    
+    // Wheels
+    const wheelGeometry = new THREE.CylinderGeometry(8, 8, 8, 16);
+    const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+    
+    const wheels = [
+        { x: -15, z: -15 },
+        { x: 15, z: -15 },
+        { x: -15, z: 15 },
+        { x: 15, z: 15 }
+    ];
+    
+    wheels.forEach(pos => {
+        const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(pos.x, 0, pos.z);
+        group.add(wheel);
+    });
+    
+    return group;
+}
+
+player.mesh = createKartMesh(0xff6b35);
+scene.add(player.mesh);
 
 // Input handling
 const keys = {};
@@ -41,35 +94,35 @@ window.addEventListener('keyup', (e) => {
 let enemies = [];
 const EnemyKart = class {
     constructor() {
-        this.x = Math.random() * (canvas.width - 40);
-        this.y = -50;
-        this.width = 40;
-        this.height = 50;
+        this.x = (Math.random() - 0.5) * 200;
+        this.y = 0;
+        this.z = -400;
+        this.width = 30;
+        this.height = 30;
         this.speed = Math.random() * 3 + 2;
         this.direction = Math.random() > 0.5 ? 1 : -1;
-        this.color = '#00ff00';
+        this.mesh = createKartMesh(0x00ff00);
+        this.mesh.position.set(this.x, this.y, this.z);
+        scene.add(this.mesh);
     }
 
     update() {
-        this.y += this.speed;
+        this.z += this.speed;
         this.x += this.direction * 1.5;
 
-        if (this.x < 0 || this.x + this.width > canvas.width) {
+        if (this.x < -100 || this.x > 100) {
             this.direction *= -1;
         }
-    }
-
-    draw() {
-        ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
         
-        // Janela
-        ctx.fillStyle = '#87ceeb';
-        ctx.fillRect(this.x + 10, this.y + 10, 20, 15);
+        this.mesh.position.set(this.x, this.y, this.z);
     }
 
     isOffScreen() {
-        return this.y > canvas.height;
+        return this.z > 150;
+    }
+
+    dispose() {
+        scene.remove(this.mesh);
     }
 };
 
@@ -77,31 +130,35 @@ const EnemyKart = class {
 let obstacles = [];
 const Obstacle = class {
     constructor() {
-        this.x = Math.random() * (canvas.width - 30);
-        this.y = -30;
+        this.x = (Math.random() - 0.5) * 200;
+        this.y = 0;
+        this.z = -400;
         this.width = 30;
         this.height = 30;
         this.speed = Math.random() * 2 + 1;
-        this.color = '#8B4513';
+        this.rotation = 0;
+        
+        const obstacleGeometry = new THREE.BoxGeometry(30, 30, 30);
+        const obstacleMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+        this.mesh = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
+        this.mesh.position.set(this.x, this.y, this.z);
+        scene.add(this.mesh);
     }
 
     update() {
-        this.y += this.speed;
-    }
-
-    draw() {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.moveTo(this.x + this.width / 2, this.y);
-        ctx.lineTo(this.x + this.width, this.y + this.height / 2);
-        ctx.lineTo(this.x + this.width / 2, this.y + this.height);
-        ctx.lineTo(this.x, this.y + this.height / 2);
-        ctx.closePath();
-        ctx.fill();
+        this.z += this.speed;
+        this.rotation += 0.02;
+        this.mesh.rotation.x += 0.02;
+        this.mesh.rotation.y += 0.02;
+        this.mesh.position.set(this.x, this.y, this.z);
     }
 
     isOffScreen() {
-        return this.y > canvas.height;
+        return this.z > 150;
+    }
+
+    dispose() {
+        scene.remove(this.mesh);
     }
 };
 
@@ -109,65 +166,45 @@ const Obstacle = class {
 let coins_list = [];
 const Coin = class {
     constructor() {
-        this.x = Math.random() * (canvas.width - 20);
-        this.y = -20;
+        this.x = (Math.random() - 0.5) * 200;
+        this.y = 0;
+        this.z = -400;
         this.width = 20;
         this.height = 20;
         this.speed = Math.random() * 1.5 + 0.5;
-        this.color = '#ffd60a';
         this.rotation = 0;
+        
+        const coinGeometry = new THREE.CylinderGeometry(15, 15, 5, 32);
+        const coinMaterial = new THREE.MeshLambertMaterial({ color: 0xffd60a });
+        this.mesh = new THREE.Mesh(coinGeometry, coinMaterial);
+        this.mesh.position.set(this.x, this.y, this.z);
+        scene.add(this.mesh);
     }
 
     update() {
-        this.y += this.speed;
-        this.rotation += 0.1;
-    }
-
-    draw() {
-        ctx.save();
-        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-        ctx.rotate(this.rotation);
-        
-        // Moeda
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(0, 0, 10, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Borda
-        ctx.strokeStyle = '#ffed4e';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        
-        ctx.restore();
+        this.z += this.speed;
+        this.rotation += 0.05;
+        this.mesh.rotation.x = this.rotation;
+        this.mesh.position.set(this.x, this.y, this.z);
     }
 
     isOffScreen() {
-        return this.y > canvas.height;
+        return this.z > 150;
+    }
+
+    dispose() {
+        scene.remove(this.mesh);
     }
 };
 
-// Draw player
-function drawPlayer() {
-    ctx.fillStyle = player.color;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-    
-    // Janela do kart
-    ctx.fillStyle = '#87ceeb';
-    ctx.fillRect(player.x + 10, player.y + 10, 20, 20);
-    
-    // Detalhes
-    ctx.fillStyle = '#000';
-    ctx.fillRect(player.x + 5, player.y + 35, 10, 10);
-    ctx.fillRect(player.x + 25, player.y + 35, 10, 10);
-}
-
 // Collision detection
-function checkCollision(rect1, rect2) {
-    return rect1.x < rect2.x + rect2.width &&
-           rect1.x + rect1.width > rect2.x &&
-           rect1.y < rect2.y + rect2.height &&
-           rect1.y + rect1.height > rect2.y;
+function checkCollision(pos1, pos2, radius = 30) {
+    const distance = Math.sqrt(
+        Math.pow(pos1.x - pos2.x, 2) +
+        Math.pow(pos1.y - pos2.y, 2) +
+        Math.pow(pos1.z - pos2.z, 2)
+    );
+    return distance < radius * 2;
 }
 
 // Update game
@@ -176,23 +213,23 @@ function updateGame() {
 
     // Player movement
     if (keys['arrowleft'] || keys['a']) {
-        player.x -= player.maxSpeed;
+        player.x = Math.max(player.x - player.maxSpeed, -100);
     }
     if (keys['arrowright'] || keys['d']) {
-        player.x += player.maxSpeed;
+        player.x = Math.min(player.x + player.maxSpeed, 100);
     }
     if (keys['p']) {
         pauseGame();
         keys['p'] = false;
     }
 
-    // Boundary checking
-    player.x = Math.max(0, Math.min(player.x, canvas.width - player.width));
+    player.mesh.position.set(player.x, player.y, player.z);
 
     // Update enemies
     enemies.forEach((enemy, index) => {
         enemy.update();
         if (enemy.isOffScreen()) {
+            enemy.dispose();
             enemies.splice(index, 1);
         }
 
@@ -200,8 +237,7 @@ function updateGame() {
         if (checkCollision(player, enemy)) {
             score = Math.max(0, score - 20);
             updateScore();
-            // Push player back
-            player.y -= 30;
+            player.z -= 30;
         }
     });
 
@@ -209,6 +245,7 @@ function updateGame() {
     obstacles.forEach((obstacle, index) => {
         obstacle.update();
         if (obstacle.isOffScreen()) {
+            obstacle.dispose();
             obstacles.splice(index, 1);
         }
 
@@ -216,8 +253,7 @@ function updateGame() {
         if (checkCollision(player, obstacle)) {
             score = Math.max(0, score - 20);
             updateScore();
-            // Push player back
-            player.y -= 30;
+            player.z -= 30;
         }
     });
 
@@ -225,73 +261,45 @@ function updateGame() {
     coins_list.forEach((coin, index) => {
         coin.update();
         if (coin.isOffScreen()) {
+            coin.dispose();
             coins_list.splice(index, 1);
         }
 
         // Check collision with player
-        if (checkCollision(player, coin)) {
+        if (checkCollision(player, coin, 25)) {
             coins++;
             score += 10;
             updateScore();
+            coin.dispose();
             coins_list.splice(index, 1);
         }
     });
 
     // Spawn new enemies
-    if (Math.random() < 0.02) {
+    if (Math.random() < 0.015) {
         enemies.push(new EnemyKart());
     }
 
     // Spawn new obstacles
-    if (Math.random() < 0.015) {
+    if (Math.random() < 0.012) {
         obstacles.push(new Obstacle());
     }
 
     // Spawn new coins
-    if (Math.random() < 0.03) {
+    if (Math.random() < 0.025) {
         coins_list.push(new Coin());
     }
 }
 
-// Draw game
-function drawGame() {
-    // Background
-    ctx.fillStyle = 'rgba(26, 58, 82, 0.95)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Road lines
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([20, 20]);
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2, 0);
-    ctx.lineTo(canvas.width / 2, canvas.height);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Draw player
-    drawPlayer();
-
-    // Draw enemies
-    enemies.forEach(enemy => enemy.draw());
-
-    // Draw obstacles
-    obstacles.forEach(obstacle => obstacle.draw());
-
-    // Draw coins
-    coins_list.forEach(coin => coin.draw());
-
-    // Draw game over state
-    if (!gameRunning && !gamePaused) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
+// Render game
+function renderGame() {
+    renderer.render(scene, camera);
 }
 
 // Game loop
 function gameLoop() {
     updateGame();
-    drawGame();
+    renderGame();
     requestAnimationFrame(gameLoop);
 }
 
@@ -310,17 +318,28 @@ function updateRecord() {
     document.getElementById('record').textContent = record;
 }
 
+// Clean up game
+function cleanupGame() {
+    enemies.forEach(enemy => enemy.dispose());
+    obstacles.forEach(obstacle => obstacle.dispose());
+    coins_list.forEach(coin => coin.dispose());
+    enemies = [];
+    obstacles = [];
+    coins_list = [];
+}
+
 // Start game
 function startGame() {
     gameRunning = true;
     gamePaused = false;
     score = 0;
     coins = 0;
-    enemies = [];
-    obstacles = [];
-    coins_list = [];
-    player.x = canvas.width / 2;
-    player.y = canvas.height - 100;
+    cleanupGame();
+    
+    player.x = 0;
+    player.y = 0;
+    player.z = -150;
+    player.mesh.position.set(player.x, player.y, player.z);
     
     updateScore();
     toggleMenu();
@@ -331,15 +350,6 @@ function startGame() {
 function pauseGame() {
     gamePaused = !gamePaused;
     document.getElementById('resumeBtn').style.display = gamePaused ? 'inline-block' : 'none';
-    
-    if (gamePaused) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#ffd60a';
-        ctx.font = 'bold 48px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('PAUSADO', canvas.width / 2, canvas.height / 2);
-    }
 }
 
 // Resume game
@@ -354,11 +364,12 @@ function resetGame() {
     gamePaused = false;
     score = 0;
     coins = 0;
-    enemies = [];
-    obstacles = [];
-    coins_list = [];
-    player.x = canvas.width / 2;
-    player.y = canvas.height - 100;
+    cleanupGame();
+    
+    player.x = 0;
+    player.y = 0;
+    player.z = -150;
+    player.mesh.position.set(player.x, player.y, player.z);
     
     updateScore();
     toggleMenu();
@@ -389,8 +400,11 @@ function goToPitch() {
 
 // Responsive canvas
 window.addEventListener('resize', () => {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    const width = canvas.offsetWidth;
+    const height = canvas.offsetHeight;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
 });
 
 // Initialize record display
@@ -402,19 +416,9 @@ toggleMenu();
 // Start game loop
 gameLoop();
 
-// End game after 2 minutes (optional - remove if you want infinite game)
-let gameTimer = null;
-function startGameTimer() {
-    gameTimer = setTimeout(() => {
-        if (gameRunning) {
-            endGame();
-        }
-    }, 120000); // 2 minutos
-}
-
-// Modify startGame to include timer
-const originalStartGame = startGame;
-startGame = function() {
-    originalStartGame();
-    startGameTimer();
-};
+// End game after 2 minutes
+setTimeout(() => {
+    if (gameRunning && !gamePaused) {
+        endGame();
+    }
+}, 120000);
