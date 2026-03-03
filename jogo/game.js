@@ -282,6 +282,9 @@ function updateGame() {
         keys['p'] = false;
     }
 
+    // Player always moves forward
+    player.z += 3;
+
     player.mesh.position.set(player.x, player.y, player.z);
 
     // Move road stripes
