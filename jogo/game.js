@@ -6,8 +6,8 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true 
 
 renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
 renderer.setClearColor(0x1a3a52, 1);
-camera.position.set(0, 30, 150);
-camera.lookAt(0, 0, 0);
+camera.position.set(0, 60, -100);
+camera.lookAt(0, 10, 50);
 
 // Lighting
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -30,8 +30,8 @@ let gameTimer = null;
 // Player Kart
 const player = {
     x: 0,
-    y: 0,
-    z: -150,
+    y: 10,
+    z: 0,
     width: 30,
     height: 30,
     maxSpeed: 7,
@@ -80,21 +80,40 @@ function createKartMesh(color) {
 player.mesh = createKartMesh(0xff6b35);
 scene.add(player.mesh);
 
+// Create road/track
+const roadGeometry = new THREE.PlaneGeometry(200, 2000);
+const roadMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+const road = new THREE.Mesh(roadGeometry, roadMaterial);
+road.rotation.x = -Math.PI / 2;
+road.position.y = -15;
+scene.add(road);
+
 // Road stripes for visual effect
 const roadStripes = [];
 function createRoadStripes() {
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 40; i++) {
         const stripeGeometry = new THREE.PlaneGeometry(200, 20);
         const stripeMaterial = new THREE.MeshLambertMaterial({ color: 0xffd60a });
         const stripe = new THREE.Mesh(stripeGeometry, stripeMaterial);
         stripe.rotation.x = -Math.PI / 2;
-        stripe.position.y = -0.5;
-        stripe.position.z = i * 50;
+        stripe.position.y = -14.5;
+        stripe.position.z = i * 50 - 1000;
         scene.add(stripe);
         roadStripes.push(stripe);
     }
 }
 createRoadStripes();
+
+// Road walls
+const wallGeometry = new THREE.BoxGeometry(20, 50, 2000);
+const wallMaterial = new THREE.MeshLambertMaterial({ color: 0xff6b35 });
+const wallLeft = new THREE.Mesh(wallGeometry, wallMaterial);
+wallLeft.position.set(-110, 0, 0);
+scene.add(wallLeft);
+
+const wallRight = new THREE.Mesh(wallGeometry, wallMaterial);
+wallRight.position.set(110, 0, 0);
+scene.add(wallRight);
 
 // Input handling
 const keys = {};
@@ -113,12 +132,12 @@ window.addEventListener('keyup', (e) => {
 let enemies = [];
 const EnemyKart = class {
     constructor() {
-        this.x = (Math.random() - 0.5) * 200;
-        this.y = 0;
-        this.z = Math.random() * 300 + 100;
+        this.x = (Math.random() - 0.5) * 150;
+        this.y = 10;
+        this.z = player.z - 300 - Math.random() * 300;
         this.width = 30;
         this.height = 30;
-        this.speed = Math.random() * 3 + 2;
+        this.speed = Math.random() * 2 + 3;
         this.direction = Math.random() > 0.5 ? 1 : -1;
         this.mesh = createKartMesh(0x00ff00);
         this.mesh.position.set(this.x, this.y, this.z);
@@ -129,7 +148,7 @@ const EnemyKart = class {
         this.z += this.speed;
         this.x += this.direction * 1.5;
 
-        if (this.x < -100 || this.x > 100) {
+        if (this.x < -90 || this.x > 90) {
             this.direction *= -1;
         }
         
@@ -137,7 +156,7 @@ const EnemyKart = class {
     }
 
     isOffScreen() {
-        return this.z > 500;
+        return this.z > player.z + 100;
     }
 
     dispose() {
@@ -149,9 +168,9 @@ const EnemyKart = class {
 let obstacles = [];
 const Obstacle = class {
     constructor() {
-        this.x = (Math.random() - 0.5) * 200;
-        this.y = 0;
-        this.z = Math.random() * 300 + 100;
+        this.x = (Math.random() - 0.5) * 150;
+        this.y = 15;
+        this.z = player.z - 300 - Math.random() * 300;
         this.width = 30;
         this.height = 30;
         this.speed = Math.random() * 2 + 1;
@@ -173,7 +192,7 @@ const Obstacle = class {
     }
 
     isOffScreen() {
-        return this.z > 500;
+        return this.z > player.z + 100;
     }
 
     dispose() {
@@ -185,12 +204,12 @@ const Obstacle = class {
 let coins_list = [];
 const Coin = class {
     constructor() {
-        this.x = (Math.random() - 0.5) * 200;
-        this.y = 0;
-        this.z = Math.random() * 300 + 100;
+        this.x = (Math.random() - 0.5) * 150;
+        this.y = 30;
+        this.z = player.z - 300 - Math.random() * 300;
         this.width = 20;
         this.height = 20;
-        this.speed = Math.random() * 1.5 + 0.5;
+        this.speed = Math.random() * 1.5 + 1;
         this.rotation = 0;
         
         const coinGeometry = new THREE.CylinderGeometry(15, 15, 5, 32);
@@ -208,7 +227,7 @@ const Coin = class {
     }
 
     isOffScreen() {
-        return this.z > 500;
+        return this.z > player.z + 100;
     }
 
     dispose() {
@@ -263,7 +282,7 @@ function updateGame() {
     // Move road stripes
     roadOffset += 3;
     roadStripes.forEach((stripe, index) => {
-        stripe.position.z = ((index * 50 + roadOffset) % 1000) - 500;
+        stripe.position.z = player.z - 1000 + (index * 50) + (roadOffset % 50);
     });
 
     // Update enemies
@@ -332,11 +351,11 @@ function updateGame() {
 
 // Render game
 function renderGame() {
-    // Câmera fixa olhando para frente na pista, acompanhando X do jogador
-    camera.position.x = player.x * 0.5;
-    camera.position.y = 40;
-    camera.position.z = -80;
-    camera.lookAt(player.x, 0, 0);
+    // Câmera em terceira pessoa atrás do kart
+    camera.position.x = player.x * 0.8;
+    camera.position.y = 60;
+    camera.position.z = player.z - 100;
+    camera.lookAt(player.x, 10, player.z + 50);
     
     renderer.render(scene, camera);
 }
@@ -391,8 +410,8 @@ function startGame() {
     cleanupGame();
     
     player.x = 0;
-    player.y = 0;
-    player.z = -150;
+    player.y = 10;
+    player.z = 0;
     player.mesh.position.set(player.x, player.y, player.z);
     
     updateScore();
@@ -424,8 +443,8 @@ function resetGame() {
     cleanupGame();
     
     player.x = 0;
-    player.y = 0;
-    player.z = -150;
+    player.y = 10;
+    player.z = 0;
     player.mesh.position.set(player.x, player.y, player.z);
     
     updateScore();
