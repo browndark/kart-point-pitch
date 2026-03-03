@@ -1,0 +1,23 @@
+{
+  "name": "kart-point-pitch",
+  "version": "1.0.0",
+  "description": "Pitch website for Kart Point - A innovative karting game with unique scoring mechanics",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "open http://localhost:8000 && python -m http.server 8000"
+  },
+  "keywords": [
+    "kart",
+    "game",
+    "pitch",
+    "website",
+    "racing"
+  ],
+  "author": "Kart Point Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seu-usuario/kart-point-pitch.git"
+  }
+}
